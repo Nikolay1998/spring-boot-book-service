@@ -1,0 +1,87 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Жанры</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+</head>
+<body>
+<div class="header">
+    <div class="header-link">
+        <a href="/xml/genres">XML</a>
+    </div>
+    <div>
+        <a href="authors.html">Авторы</a>
+    </div>
+    <div>
+        <a href="books.html">Книги</a>
+    </div>
+    <div>
+        <a href="genres.html">Жанры</a>
+    </div>
+</div>
+<p>
+<div id="content">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <td>Название</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="genre in genreList">
+                <td>{{genre.name}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p>
+    <div class="creation">
+        <div class="creation-form">
+            <div class="input-form">
+                <label for="name">Имя</label>
+                <input id="name" type="text" v-model="name">
+            </div>
+            <div class="input-form">
+                <button style="margin: auto" @click="addGenre">Добавить жанр</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#content",
+        data: {
+            addApi: Vue.resource('../add_genre'),
+            genreListApi: Vue.resource('../genres'),
+            genreList: [],
+            name: ""
+        },
+        methods: {
+            addGenre: function () {
+                if (this.name === "") {
+                    alert("Fill name");
+                    return;
+                }
+                this.addApi
+                    .get({
+                        name: this.name,
+                    });
+            }
+        }
+        ,
+        beforeMount: function () {
+            this.genreListApi
+                .get()
+                .then(
+                    response => {
+                        this.genreList = response.body;
+                    }
+                );
+        }
+    });
+
+</script>
+</body>
+</html>

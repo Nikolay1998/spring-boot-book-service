@@ -1,0 +1,107 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Авторы</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+</head>
+<body>
+<div class="header">
+    <div class="header-link">
+        <a href="/xml/authors">XML</a>
+    </div>
+    <div class="header-link current-link">
+        <a href="authors.html">Авторы</a>
+    </div>
+    <div class="header-link">
+        <a href="books.html">Книги</a>
+    </div>
+    <div>
+        <a href="genres.html">Жанры</a>
+    </div>
+</div>
+<p>
+<div id="content">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <td>Имя</td>
+                <td>Фамилия</td>
+                <td>Пол</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="author in authors">
+                <td>{{author.name}}</td>
+                <td>{{author.surname}}</td>
+                <td>{{author.gender}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p>
+    <div class="creation">
+        <div class="creation-form">
+            <div class="input-form">
+                <label for="name">Имя</label>
+                <input id="name" type="text" v-model="name">
+            </div>
+            <div class="input-form">
+                <label for="surname">Фамилия</label>
+                <input id="surname" type="text" v-model="surname">
+            </div>
+            <div class="input-form">
+                <label for="gender">Пол</label>
+                <input id="gender" type="text" v-model="gender">
+            </div>
+            <div class="input-form">
+                <button style="margin: auto" @click="addAuthor">Добавить автора</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#content",
+        data: {
+            addApi: Vue.resource('../add_author'),
+            authorListApi: Vue.resource('../authors'),
+            bookList: [],
+            authors: [],
+            name: "",
+            surname: "",
+            gender: ""
+        },
+        methods: {
+            addAuthor: function () {
+                if (this.name === "" || this.surname === "" || this.gender === "" ) {
+                    alert("Fill name, surname, gender");
+                    return;
+                }
+                this.addApi
+                    .get({
+                        name: this.name,
+                        surname: this.surname,
+                        gender: this.gender,
+                    });
+            }
+        }
+        ,
+            beforeMount: function () {
+
+                this.authorListApi
+                    .get()
+                    .then(
+                        response => {
+                            this.authors = response.body;
+                        }
+                    );
+
+
+            }
+    });
+
+</script>
+</body>
+</html>

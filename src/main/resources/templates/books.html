@@ -1,0 +1,136 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Книги</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+</head>
+<body>
+<div class="header">
+    <div class="header-link">
+        <a href="/xml/books">XML</a>
+    </div>
+    <div class="header-link current-link">
+        <a href="authors.html">Авторы</a>
+    </div>
+    <div class="header-link">
+        <a href="books.html">Книги</a>
+    </div>
+    <div>
+        <a href="genres.html">Жанры</a>
+    </div>
+</div>
+<p>
+<div id="content">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <td>Название</td>
+                <td>Жанр</td>
+                <td>Количество</td>
+                <td>Автор</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="book in bookList">
+                <td>{{book.name}}</td>
+                <td>{{book.genre.name}}</td>
+                <td>{{book.count}}</td>
+                <td>{{book.author.name + book.author.surname}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p>
+    <div class="creation">
+        <div class="creation-form">
+            <div class="input-form">
+                <label for="name">Название</label>
+                <input id="name" type="text" v-model="name">
+            </div>
+            <div class="input-form">
+                <label for="count">Количество</label>
+                <input id="count" type="number" v-model="count">
+            </div>
+            <div class="input-form">
+                <label for="genre">Жанр</label>
+                <select id="genre" v-model="selectedGenre">
+                    <option v-for="genre in genreList" v-bind:value="genre.id">{{genre.name}}</option>
+                </select>
+            </div>
+            <div class="input-form">
+                <label for="author">Автор</label>
+                <select id="author" v-model="selectedAuthor">
+                    <option v-for="author in authors" v-bind:value="author.id">{{author.name}}</option>
+                </select>
+            </div>
+            <div class="input-form">
+                <button style="margin: auto" @click="addBook">Добавить книгу</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#content",
+        data: {
+            addApi: Vue.resource('../add_book'),
+            bookListApi: Vue.resource('../books'),
+            authorListApi: Vue.resource('../authors'),
+            genreListApi: Vue.resource('../genres'),
+            bookList: [],
+            authors: [],
+            genreList: [],
+            name: "",
+            count: "",
+            selectedGenre: "",
+            selectedAuthor: ""
+
+        },
+        methods: {
+            addBook: function () {
+                if (this.name === "" || this.count === "" || this.selectedGenre === "" || this.selectedAuthor === "") {
+                    alert("Fill name, count, genre, author");
+                    return;
+                }
+                this.addApi
+                    .get({
+                        name: this.name,
+                        count: this.count,
+                        genreId: this.selectedGenre,
+                        authorId: this.selectedAuthor
+                    });
+            }
+        }
+        ,
+        beforeMount: function () {
+                this.bookListApi
+                    .get()
+                    .then(
+                        response => {
+                            this.bookList = response.body;
+                        }
+                    );
+                this.authorListApi
+                    .get()
+                    .then(
+                        response => {
+                            this.authors = response.body;
+                        }
+                    );
+                this.genreListApi
+                    .get()
+                    .then(
+                        response => {
+                            this.genreList = response.body;
+                    }
+                );
+
+            }
+
+    });
+
+</script>
+</body>
+</html>
